@@ -20,7 +20,7 @@ Last updated: Oct 28, 2026
 | In-game semester clock, "Semester over" screen, back to lobby | Done |
 | UC 3rd floor lounge placeholder room with a sight-blocking bookshelf | Done |
 | Shared minigame interface plus the Proof Chain problem set | Done |
-| Collaboration: E at a task station, accept or decline, 10 s timeout | Done |
+| Collaboration: a **Collaborate with [name]** button at a task station (replaced pressing E), accept or decline, 10 s timeout | Done |
 | TA capture (captured student sees "You failed the class" and disappears) | Done |
 | Line of sight on the host plus the TA's report popup (1-week expiry, 2-week cooldown; filing does nothing else yet) | Done |
 | Unit tests for clock, report limits, roles, line of sight and the puzzle (26 passing) | Done |

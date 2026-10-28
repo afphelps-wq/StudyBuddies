@@ -3,7 +3,8 @@ extends Node
 ## Pass flags after `--`, e.g. `godot --path . -- --host --dev --autostart=3`.
 ##
 ##   --name=X --color=N        use this name/color for this run (not saved)
-##   --host / --join=IP        host or join on the default port at startup
+##   --host / --join=IP        host or join at startup
+##   --port=N                  port for --host/--join (default from balance)
 ##   --dev                     turn on dev mode (host)
 ##   --autostart=N             host starts the game once N players are in
 ##   --force-ta=NAME|host      dev mode: force who is TA (host)
@@ -35,6 +36,8 @@ func _ready() -> void:
 		return
 	log_line("flags %s" % flags)
 	if has("name"):
+		# Scripted runs share the real player's profile file; never write to it.
+		Session.profile_saving = false
 		Session.profile_name = Session.clean_name(get_flag("name"))
 	if has("color"):
 		Session.profile_color = get_flag("color").to_int()
@@ -79,11 +82,16 @@ func bot_move_dir(from: Vector2) -> Vector2:
 func _connect_at_startup() -> void:
 	if has("dev"):
 		Session.set_dev_mode(true)
+	var port := get_flag("port", str(Session.balance.default_port)).to_int()
 	if has("host"):
-		NetworkService.host_lan(Session.balance.default_port, Session.balance.max_players)
+		var err := NetworkService.host_lan(port, Session.balance.max_players)
+		if err != OK:
+			log_line("couldn't host on port %d, quitting" % port)
+			get_tree().quit(1)
+			return
 		App.go_to_lobby()
 	elif has("join"):
-		NetworkService.join_lan(get_flag("join"), Session.balance.default_port)
+		NetworkService.join_lan(get_flag("join"), port)
 		NetworkService.connected_to_host.connect(App.go_to_lobby, CONNECT_ONE_SHOT)
 
 

@@ -14,6 +14,8 @@ var balance: GameBalance = preload("res://config/game_balance.tres")
 
 var profile_name: String = ""
 var profile_color: int = 0
+## Turned off by DevTools for scripted test runs.
+var profile_saving: bool = true
 
 ## peer_id -> {"name": String, "color": int}
 var roster: Dictionary[int, Dictionary] = {}
@@ -51,6 +53,8 @@ func load_profile() -> void:
 
 
 func save_profile() -> void:
+	if not profile_saving:
+		return
 	var cfg := ConfigFile.new()
 	cfg.set_value("profile", "name", profile_name)
 	cfg.set_value("profile", "color", profile_color)

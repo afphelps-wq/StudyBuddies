@@ -75,7 +75,8 @@ Machine-specific settings such as the relay server address go in `config/local.c
 | Key | Action |
 | --- | --- |
 | WASD / arrows | Move |
-| E | Interact / collaborate |
+| Mouse | Click **Collaborate with [name]** when you're at a task station next to someone |
+| E | Interact (not used yet) |
 | Tab | Task list |
 | Enter | Open chat (dinners) |
 | Esc | Menu |

@@ -16,7 +16,8 @@ var _is_ta: bool = false
 var _role_label: Label
 var _week_label: Label
 var _ta_label: Label
-var _prompt: Label
+var _collab_row: Control
+var _collab_button: Button
 var _toast: Label
 var _toast_until_ms: int = 0
 var _banner: Label
@@ -76,11 +77,15 @@ func setup(game: Game) -> void:
 	_ta_label = UI.label("", 8, UI.ALERT)
 	bar_row.add_child(_ta_label)
 
-	_prompt = _outlined_label(8)
-	_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_prompt.position = Vector2(0, 270 - 22)
-	_prompt.size = Vector2(480, 12)
-	root.add_child(_prompt)
+	# Shown when you're at a task station next to someone you can work with.
+	_collab_row = CenterContainer.new()
+	_collab_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_collab_row.position = Vector2(0, 270 - 30)
+	_collab_row.size = Vector2(480, 20)
+	_collab_row.visible = false
+	root.add_child(_collab_row)
+	_collab_button = UI.button("", _ask_partner)
+	_collab_row.add_child(_collab_button)
 
 	_toast = _outlined_label(8)
 	_toast.position = Vector2(0, 22)
@@ -249,17 +254,17 @@ func _modal_open() -> bool:
 
 func _update_prompt() -> void:
 	_prompt_target = _find_partner() if not _modal_open() else 0
+	_collab_row.visible = _prompt_target != 0
 	if _prompt_target == 0:
-		_prompt.text = ""
 		_prompt_since_ms = 0
 		return
 	if _prompt_since_ms == 0:
 		_prompt_since_ms = Time.get_ticks_msec()
-	_prompt.text = "[E] Ask %s to do the Problem Set" % _game.player_name(_prompt_target)
+	_collab_button.text = "Collaborate with %s" % _game.player_name(_prompt_target)
 	if DevTools.has("bot-collab") and Time.get_ticks_msec() - _prompt_since_ms > BOT_DELAY_SEC * 1000.0:
 		_prompt_since_ms = Time.get_ticks_msec() + 5000
 		DevTools.log_line("bot asks %s" % _game.player_name(_prompt_target))
-		_game.rq_collab.rpc_id(NetworkService.HOST_ID, _prompt_target)
+		_ask_partner()
 
 
 ## The nearest other player standing at the same task station as you, or 0.
@@ -288,11 +293,13 @@ func _find_partner() -> int:
 	return 0
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("interact") and _prompt_target != 0 and not _modal_open():
-		get_viewport().set_input_as_handled()
+func _ask_partner() -> void:
+	if _prompt_target != 0 and not _modal_open():
 		_game.rq_collab.rpc_id(NetworkService.HOST_ID, _prompt_target)
-	elif event.is_action_pressed("menu") and _minigame == null and not _game.semester_over:
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu") and _minigame == null and not _game.semester_over:
 		get_viewport().set_input_as_handled()
 		_menu_overlay.visible = not _menu_overlay.visible
 
