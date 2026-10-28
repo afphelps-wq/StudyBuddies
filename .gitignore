@@ -1,0 +1,17 @@
+# Godot
+.godot/
+*.translation
+/android/
+
+# Builds
+/build/
+*.dmg
+*.zip
+*.exe
+*.pck
+
+# Local-only config (relay address, keys). Never commit.
+config/local.cfg
+
+# OS
+.DS_Store
